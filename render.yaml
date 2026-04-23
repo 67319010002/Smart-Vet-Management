@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: smart-vet-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smart-vet-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+
+databases:
+  - name: smart-vet-db
+    databaseName: vet_db
+    user: postgres
