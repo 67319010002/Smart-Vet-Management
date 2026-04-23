@@ -2,6 +2,7 @@ services:
   - type: web
     name: smart-vet-backend
     env: node
+    plan: free
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
@@ -17,3 +18,4 @@ services:
 
 databases:
   - name: smart-vet-db
+    plan: free
