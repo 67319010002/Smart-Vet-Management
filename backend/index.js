@@ -16,17 +16,32 @@ app.get('/health', (req, res) => {
 });
 
 if (require.main === module) {
-  // Sync Database and Start Server
-  sequelize.sync({ alter: true })
-    .then(() => {
-      console.log('Database synced');
-      app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-      });
-    })
-    .catch(err => {
-      console.error('Failed to sync database: ', err);
-    });
+  // Start server first so Render passes the port binding check
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    
+    // Attempt to sync database with retries for cloud deployments (like Render)
+    const syncDB = async (retries = 5) => {
+      while (retries > 0) {
+        try {
+          await sequelize.sync({ alter: true });
+          console.log('Database synced successfully');
+          break;
+        } catch (err) {
+          console.error(`Failed to sync database. Retries left: ${retries - 1}. Error:`, err.message);
+          retries -= 1;
+          if (retries > 0) {
+            // Wait 5 seconds before retrying
+            await new Promise(res => setTimeout(res, 5000));
+          } else {
+            console.error('Could not connect to database after maximum retries.');
+          }
+        }
+      }
+    };
+    
+    syncDB();
+  });
 }
 
 module.exports = app;
