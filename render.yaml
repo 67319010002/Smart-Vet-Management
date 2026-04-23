@@ -17,5 +17,3 @@ services:
 
 databases:
   - name: smart-vet-db
-    databaseName: vet_db
-    user: postgres
